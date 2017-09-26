@@ -127,17 +127,35 @@ class UpstatusSerializer(serializers.ModelSerializer):
         validatedData["buildurl"] = requestData.get("buildurl")
         return validatedData
         
-    
     def update(self, instance, validated_data):
-        c_stage = instance.task.stage.value
         
         if instance.name == validated_data.get("name"):
             instance.status = validated_data.get("status")
             instance.buildurl = validated_data.get("buildurl") 
             instance.save()
-            new_instance = instance
+             #check current stage tasks finished or not
+            pipeline = instance.feature.getpipeline(instance.uuid)
+            pipekeys = pipeline.keys()
+            c_stage = instance.task.stage.value
+            idx = pipekeys.index(c_stage)
+            is_finished = True
+            
+            for build in pipeline[c_stage].values():
+                if build.status.name != "passed" and build.parent is None:
+                    is_finished = False 
+                    
+            #send next stage build
+            if idx == len(pipekeys)-1 or not is_finished:
+                pass
+            else :
+                for build in pipeline[pipekeys[idx+1]].values():
+                    t = task_client(build)
+                    t.trigger_builder() 
+            
+            return instance
         else:
-            new_instance,created = Build.objects.get_or_create(parent=instance,name=validated_data.get("name"))
+            name = "sub_{}_{}".format(instance.name,validated_data.get("name"))
+            new_instance,created = Build.objects.get_or_create(parent=instance,name=name)
             if created:
                 new_instance.trigger = instance.trigger
                 new_instance.feature = instance.feature
@@ -150,22 +168,6 @@ class UpstatusSerializer(serializers.ModelSerializer):
             new_instance.buildurl = validated_data.get("buildurl")
             new_instance.save()
        
-        #check current stage tasks finished or not
-        pipeline = instance.feature.getpipeline(instance.uuid)
-        pipekeys = pipeline.keys()
-        idx = pipekeys.index(c_stage)
-        is_finished = True
-        for build in pipeline[c_stage].values():
-            if build.status.name != "passed":
-                is_finished = False 
-                
-        #send next stage build
-        if idx == len(pipekeys)-1 or not is_finished:
-            pass
-        else :
-            for build in pipeline[pipekeys[idx+1]].values():
-                t = task_client(build)
-                t.trigger_builder() 
         return new_instance
     
     
