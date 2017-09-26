@@ -37,7 +37,7 @@ admin.site.register(Casetag)
 admin.site.register(Userdefcaseset,UserdefcasesetAdmin)
 admin.site.register(Userdeftagset,UserdeftagsetAdmin)
 admin.site.register(Featurebuilder)
-
+admin.site.register(Key_tables)
 
 
 

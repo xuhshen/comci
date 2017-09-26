@@ -37,6 +37,21 @@ class Stage(models.Model):
     
     def __str__(self):
         return self.name 
+
+class Key_tables(models.Model):
+    key = models.CharField(max_length=200)
+    table = models.CharField(max_length=200)
+    
+    def __str__(self):
+        return self.name
+    
+    def getvalues(self):
+        try:
+            values = eval(self.table).objects.all()
+        except:
+            values = None
+        
+        return values
     
 class Status(models.Model):
     '''define the status types for builds and features
@@ -85,9 +100,19 @@ class Task(models.Model):
                 key4=
                 __key5=value5
     ''')
-    
     def __str__(self):
         return self.name
+    
+    def getparams(self):
+        res = {}
+        for k_val in self.params.split("\n"):
+            try:
+                clean_str = k_val.strip()
+                key,var = clean_str.split("=")
+                res[key] = var
+            except:
+                pass
+        return res
 
 class Moduletype(models.Model):
     name = models.CharField(max_length=200)
@@ -159,6 +184,15 @@ class Feature(models.Model):
     def __str__(self):
         return self.name
     
+    def getuser_defined_vars(self):
+        vars = []
+        for task in self.task.all():
+            for k,v in task.getparams().items():
+                if k.startswith("__"):
+                    name = "{}_{}".format(task.name,k)
+                    vars.append({name:v}) 
+        return vars 
+    
     def getlatestbuild(self):
         return Build.objects.filter(feature__name=self.name)
     
@@ -218,14 +252,6 @@ class Build(models.Model):
             res = json.loads(self.params)
         except:
             res = {}
-#         res = {}
-#         for k_val in self.params.split("\n"):
-#             try:
-#                 clean_str = k_val.strip()
-#                 key,var = clean_str.split("=")
-#                 res[key] = var
-#             except:
-#                 pass
         return res
     
     def getdynamicparams(self):
