@@ -1,0 +1,25 @@
+#centos
+安装mysql：
+# yum install mariadb-server -y //如果已安装可以省略  
+# systemctl start mariadb.service //启动服务  
+# systemctl enable mariadb.service //开机启动服务  
+# mysql -u root -p //登录mysql  	
+
+
+pip install django -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install djangorestframework -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install gearman
+
+python manage.py runserver 0:8000
+
+python manage.py startapp polls
+
+python manage.py migrate
+python manage.py makemigrations polls
+
+python manage.py createsuperuser
+
+
+
+
+

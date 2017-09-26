@@ -1,0 +1,70 @@
+1.feature 基本属性：
+   	feature name（字符串）  		名字
+   	feature id（字符串）		编号(避免重复)
+   	feature branch（字符串）	修改分支  
+   	modules（外键）			修改的模块
+   	product（外键）         		产品线
+   	type（外键）	       		类型， 普通的，bugfix或者pronto
+   	tasks（多对多）          		测试的内容列表
+   	params（字符串）			重载的参数(间接参数，重载task 里面的部分允许重载的参数)
+ 
+2.task 基本属性：
+     product（外键）         		 产品线
+     task name （字符串）    		 名字
+     stage（外键）	       		 正常流程中的位置编号
+     type（外键）	       		 任务属性，（基本功能单元，buildflow，pipeline）
+     params（字符串）          		 任务参数,分两类，一类在创建feature时允许自定义，一类不允许自定义（feaure 配置完之后动态生成）
+      
+3.build 基本属性（task的实例）
+     name （字符串）         		名字（可用随机数或者其他编号）
+     parent（字符串）          		 对应于哪一层，默认都是feature 下面的，如果是build flow或者pipeline，还会有子的task，这时，它为对应的pipe 或者buildflow
+     buildurl （字符串）      		测试的具体链接 		
+     distributor(用外键)     哪个分发器分发的（对应 具体gearman） 
+     feature（用外键）        		对应的feature		
+     status（用外键）		         测试状态				
+     task（用外键）  		         对应的task 名字		（允许为空，为了处理pipe的子任务）
+     trigger（用外键）		         谁触发的				
+     params（字符串）		         执行时的具体参数	
+     	
+4.featurebuilder 基本属性（一次具体build，build的组合）
+    name(字符串)				名字
+    feature（外键）                           对应的feature
+    builds（多对多）			build的组合
+    
+
+#########################################################################################################################################
+扩展性考虑：
+Envvariable		全局定义一些变量
+module 			预定于各个产品线的subsystem
+Moduletypes     定义每个subsystem的类型（代码，或者case）
+basecase		预定于各个产品线的基本case单元（供上层casesets选择）  
+casesets        各种case测试集组合，在实例化测试任务的时候，允许用户在feature里进行选择
+
+basetag         等价于basecase
+tagsets         等价于casesets
+
+gearman         分发服务器（每个task会绑定这个，下发时进行对接）
+
+devices         各类测试服务器,feature 上执行相关task时，供变量重载
+
+Featuretypes    定义feature的类型
+Products        定义产品线
+Stages          标记流程中的阶段，（数值调大，间隔调大）
+
+
+status          测试状态值
+tasktypes       标记每个task的类型
+
+     
+
+
+
+
+
+
+
+
+
+	
+   		
+   
