@@ -16,6 +16,20 @@ from rest_framework import permissions
 from .utils import task_client
 # Create your views here.
 
+class ProductTaskViewSet(mixins.ListModelMixin,
+                  generics.GenericAPIView):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ProductSerializer
+    
+    def get_queryset(self):
+        queryset = Product.objects.filter()
+        return queryset
+    
+    def get(self, request, *args, **kwargs): 
+        return self.list(self, request, *args, **kwargs)
 
 class TaskViewSet(mixins.ListModelMixin,
                   generics.GenericAPIView):

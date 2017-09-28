@@ -6,6 +6,12 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 import time,json,uuid
 from .utils import task_client
 
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = "__all__"
+
+
 class TaskSerializer(serializers.ModelSerializer):
     product = serializers.CharField(source="product.name",read_only=True)
     type = serializers.CharField(source="type.name",read_only=True)
