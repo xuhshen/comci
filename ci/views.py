@@ -30,6 +30,21 @@ class ProductTaskViewSet(mixins.ListModelMixin,
     
     def get(self, request, *args, **kwargs): 
         return self.list(self, request, *args, **kwargs)
+    
+class ModuleTaskViewSet(mixins.ListModelMixin,
+                  generics.GenericAPIView):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ModuleSerializer
+    
+    def get_queryset(self):
+        queryset = Module.objects.filter()
+        return queryset
+    
+    def get(self, request, *args, **kwargs): 
+        return self.list(self, request, *args, **kwargs)
 
 class TaskViewSet(mixins.ListModelMixin,
                   generics.GenericAPIView):

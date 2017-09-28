@@ -11,14 +11,13 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = "__all__"
 
-
 class TaskSerializer(serializers.ModelSerializer):
     product = serializers.CharField(source="product.name",read_only=True)
     type = serializers.CharField(source="type.name",read_only=True)
     stage = serializers.CharField(source="stage.name",read_only=True)
     class Meta:
         model = Task
-        fields = ('name', 'product', 'type','stage')
+        fields = ('id','name', 'product', 'type','stage')
 
 class ModuleSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source="type.name",read_only=True)
@@ -26,7 +25,7 @@ class ModuleSerializer(serializers.ModelSerializer):
     repositoryserver = serializers.CharField(source="repositoryserver.server",read_only=True)
     class Meta:
         model = Module
-        fields = ('name','repository','repositoryserver', 'type','product',)
+        fields = ('id','name','repository','repositoryserver', 'type','product',)
 
 class BuildSerializer(serializers.ModelSerializer):
     params = serializers.JSONField(source="getdynamicparams",)

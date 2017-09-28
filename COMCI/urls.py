@@ -30,5 +30,5 @@ urlpatterns = [
     url(r'^newfeature/$', views.NewfeatureViewSet.as_view()),
     url(r'^tasks/$', views.TaskViewSet.as_view()),
     url(r'^product/$', views.ProductTaskViewSet.as_view()),
-    
+    url(r'^modules/$', views.ModuleTaskViewSet.as_view()),
 ]
