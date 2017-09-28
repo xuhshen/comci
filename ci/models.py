@@ -103,13 +103,14 @@ class Task(models.Model):
     def __str__(self):
         return self.name
     
-    def getparams(self):
+    def getfeature_defined_params(self):
         res = {}
         for k_val in self.params.split("\n"):
             try:
                 clean_str = k_val.strip()
                 key,var = clean_str.split("=")
-                res[key] = var
+                if key.startswith("__"):
+                    res[key] = var
             except:
                 pass
         return res
@@ -165,7 +166,6 @@ class Userdeftagset(models.Model):
     
     def __str__(self):
         return self.name
-    
 
 class Feature(models.Model):
     '''define the feature for product developing
@@ -184,15 +184,19 @@ class Feature(models.Model):
     def __str__(self):
         return self.name
     
-    def getuser_defined_vars(self):
-        vars = []
-        for task in self.task.all():
-            for k,v in task.getparams().items():
-                if k.startswith("__"):
-                    name = "{}_{}".format(task.name,k)
-                    vars.append({name:v}) 
-        return vars 
+    def getcurrent_vars(self):
+        res = json.loads(self.params)
+        return res
     
+    def updateparams(self,res,task,add=True):
+        if add:
+            if not res.has_key(task.name):
+                res[task.name] = task.getfeature_defined_params()
+        else:
+            try:del res[task.name]
+            except:pass
+        return res
+        
     def getlatestbuild(self):
         return Build.objects.filter(feature__name=self.name)
     

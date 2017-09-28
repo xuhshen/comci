@@ -1,0 +1,62 @@
+前后台接口函数：
+
+GET /newfeature/
+	获取新建feature 结构数据
+
+return :
+	{
+	    "name":"",
+	    "branch":"",
+	    "product":Product.objects.all(),
+	    "type":,                                  #Featuretype.objects.filter(product=product),根据选择的product，返回可选列表
+	    "task":, 				                  #Task.objects.all()，根据选择的product，返回可选列表
+	    "module":,    					          #Module.objects.all()，根据选择的product，返回可选列表
+	    "params":{},							  #根据选择的task，返回对应的自定义变量
+    }
+	
+POST /newfeature/  
+	保存新feature 到数据库
+	data:
+	{
+	    "name":"",
+	    "branch":"",
+	    "product":<Product>,
+	    "type":<Featuretype>,
+	    "task":[<task1>,<task2>,<task3>],
+	    "module":[<subsystem1>,<subsystem2>,<subsystem3>],
+	    "params":{
+	    			"<taskname>":{
+	    							"<var1>":"",
+	    							"<var2>":"",
+	    						}
+	    		  },
+    }
+	
+
+GET /feature/(?P<pk>[0-9]+)/
+         获取对应id feaature的结构数据
+         
+POST /feature/(?P<pk>[0-9]+)/
+         更新对应feature 到数据库
+
+
+        
+POST /trigger/                            done
+         触发一次feature 测试
+    
+    data：
+    	{
+		    "featureid": ""
+		}
+       
+POST /upstatus/(?P<pk>[0-9]+)/            done
+        跟新对应build的状态               
+   data：
+	   {
+		    "status": "",
+		    "buildurl": "",
+		    "name": ""
+	   }
+	   
+	   
+	   

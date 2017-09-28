@@ -95,6 +95,18 @@ class FeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feature
         fields = ('name', 'product', 'type','task','module','testbuilds')
+
+class NewfeatureSerializer(serializers.ModelSerializer):
+    product = serializers.CharField(source="product.name",read_only=True)
+    type = serializers.CharField(source="type.name",read_only=True)
+    task = TaskSerializer(read_only=True, many=True)
+    module = ModuleSerializer(read_only=True, many=True)
+    
+    testbuilds = BuildSerializer(source='getlatestbuild', many=True)
+    
+    class Meta:
+        model = Feature
+        fields = ('name', 'product', 'type','task','module','testbuilds')
         
 
 class UpstatusSerializer(serializers.ModelSerializer):

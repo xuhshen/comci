@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'ci.apps.CiConfig',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -57,7 +58,7 @@ ROOT_URLCONF = 'COMCI.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,7 +113,8 @@ REST_FRAMEWORK = {
        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    )
+    ),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -133,5 +135,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 ALLOWED_HOSTS = ['*']
-
 
