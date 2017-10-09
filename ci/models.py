@@ -288,7 +288,6 @@ class Feature(models.Model):
             pipeline[build.task.stage.value][build.name] = data
         print pipeline
         return pipeline
-    
 
 class Featurebuilder(models.Model):
     name = models.CharField(max_length=200)

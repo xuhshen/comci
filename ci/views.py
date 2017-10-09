@@ -86,6 +86,7 @@ class PipeLineViewSet(mixins.ListModelMixin,
     """
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = PipeLineSerializer
+    filter_fields = ('name', )
     
     def get_queryset(self):
         queryset = Feature.objects.filter()
