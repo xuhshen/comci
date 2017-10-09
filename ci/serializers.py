@@ -6,6 +6,22 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 import time,json,uuid
 from .utils import task_client
 
+class JSONSerializerField(serializers.Field):
+    """ Serializer for JSONField -- required to make field writable"""
+
+    def to_internal_value(self, data):
+        json_data = {}
+        try:
+            json_data = json.loads(data)
+        except ValueError, e:
+            pass
+        finally:
+            return json_data
+    def to_representation(self, value):
+        return value
+
+
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -28,7 +44,8 @@ class ModuleSerializer(serializers.ModelSerializer):
         fields = ('id','name','repository','repositoryserver', 'type','product',)
 
 class BuildSerializer(serializers.ModelSerializer):
-    params = serializers.JSONField(source="getdynamicparams",)
+#     params = serializers.JSONField(source="getdynamicparams",)
+    params = JSONSerializerField(source="getdynamicparams",)
     taskname = serializers.CharField(source="task.name",read_only=True)
     stage = serializers.CharField(source="task.stage.name",read_only=True)
     status = serializers.CharField(source="status.name",read_only=True)
@@ -100,6 +117,13 @@ class FeatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feature
         fields = ('name', 'product', 'type','task','module','testbuilds')
+        
+class PipeLineSerializer(serializers.ModelSerializer):
+    pipeline = serializers.JSONField(source="getlatestpipeline",read_only=True)
+    class Meta:
+        model = Feature
+        fields = ('pipeline',)
+        
 
 class NewfeatureSerializer(serializers.ModelSerializer):
     product = serializers.CharField(source="product.name",read_only=True)
@@ -119,7 +143,9 @@ class UpstatusSerializer(serializers.ModelSerializer):
     feature = serializers.CharField(source="feature.name",read_only=True)
     featureid = serializers.CharField(source="feature.featureid",read_only=True)
     
-    params = serializers.JSONField(source="getstaticparams",read_only=True)
+#     params = serializers.JSONField(source="getstaticparams",read_only=True)
+    params = JSONSerializerField(source="getstaticparams",read_only=True)
+    
     taskname = serializers.CharField(source="task.name",read_only=True)
     stage = serializers.CharField(source="task.stage.name",read_only=True)
     status = serializers.CharField(source="status.name",)

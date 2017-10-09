@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from django.conf import settings
 from rest_framework.fields import empty
 import json
+import collections
 from django.db.models import Q
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -18,6 +19,8 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 class Featuretype(models.Model):
     name = models.CharField(max_length=200)
     priority = models.IntegerField(default = 10)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name 
 
@@ -25,6 +28,8 @@ class Product(models.Model):
     '''define the product ,example:rcp,bts,5g 
     '''
     name = models.CharField(max_length=200)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -34,6 +39,8 @@ class Stage(models.Model):
     '''
     name = models.CharField(max_length=200)
     value = models.IntegerField(default=100)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name 
@@ -41,6 +48,8 @@ class Stage(models.Model):
 class Key_tables(models.Model):
     key = models.CharField(max_length=200)
     table = models.CharField(max_length=200)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -57,6 +66,8 @@ class Status(models.Model):
     '''define the status types for builds and features
     '''
     name = models.CharField(max_length=200)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name    
 
@@ -65,6 +76,8 @@ class Gearman(models.Model):
     '''
     name = models.CharField(max_length=200)
     value = models.CharField(max_length=200,default="")
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name  
@@ -72,6 +85,8 @@ class Gearman(models.Model):
 class Repository(models.Model):
     name = models.CharField(max_length=200)
     server = models.CharField(max_length=200)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name  
@@ -80,6 +95,8 @@ class Tasktype(models.Model):
     '''define the task type ,example: normal task or pipe line or build flow
     '''
     name = models.CharField(max_length=200)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name
     
@@ -100,6 +117,9 @@ class Task(models.Model):
                 key4=
                 __key5=value5
     ''')
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
         return self.name
     
@@ -117,6 +137,8 @@ class Task(models.Model):
 
 class Moduletype(models.Model):
     name = models.CharField(max_length=200)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name
 
@@ -129,6 +151,8 @@ class Module(models.Model):
     type = models.ForeignKey(Moduletype, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     repositoryserver = models.ForeignKey(Repository, on_delete=models.CASCADE)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -136,6 +160,8 @@ class Module(models.Model):
 class Caseset(models.Model):
     name = models.CharField(max_length=200)
     value = models.CharField(max_length=200)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -145,6 +171,8 @@ class Userdefcaseset(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     caseset = models.ManyToManyField(Caseset, verbose_name=u'test case set') 
     
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name
 
@@ -153,6 +181,9 @@ class Casetag(models.Model):
     '''
     name = models.CharField(max_length=200)
     tag = models.CharField(max_length=200)
+    
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -163,6 +194,8 @@ class Userdeftagset(models.Model):
     name = models.CharField(max_length=200)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     tagset = models.ManyToManyField(Casetag, verbose_name=u'test case tag') 
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -181,6 +214,9 @@ class Feature(models.Model):
     
     params = models.TextField(default="",blank=True,help_text="used to redefine task paramers")    
     
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
         return self.name
     
@@ -198,15 +234,15 @@ class Feature(models.Model):
         return res
         
     def getlatestbuild(self):
+        '''manytomany field'''
         return Build.objects.filter(feature__name=self.name)
     
     def getpipeline(self,uuid=None):
-        import collections
         pipeline = collections.OrderedDict()
         
         if not uuid:
             tasks = self.task.all()
-            stage = set([task.stage.value for task in tasks])
+            stage = sorted(list(set([task.stage.value for task in tasks])))
             
             for key in stage:
                 pipeline[key] = {}
@@ -215,20 +251,51 @@ class Feature(models.Model):
                 pipeline[task.stage.value][task.name] = task
         else:
             builds = Build.objects.filter(uuid=uuid)
-            stage = set([build.task.stage.value for build in builds])
+            stage = sorted(list(set([build.task.stage.value for build in builds])))
             
             for key in stage:
                 pipeline[key] = {}
                 
             for build in builds:
                 pipeline[build.task.stage.value][build.name] = build
-           
         return pipeline
+    
+    def getlatestpipeline(self):
+        try:
+            latestbuild = Featurebuilder.objects.order_by('-create_time')[5] 
+        except:
+            return {}
+        
+        pipeline = collections.OrderedDict()
+        
+        builds = Build.objects.filter(uuid=latestbuild)
+        print builds
+        stage = sorted(list(set([build.task.stage.value for build in builds])))
+        
+        for key in stage:
+            pipeline[key] = {}
+            
+        for build in builds:
+            data = {
+                    "buildurl":build.buildurl,
+                    "feature":build.feature.name,
+                    "status":build.status.name,
+                    "task":build.task.name,
+                    "params":build.getstaticparams(),
+                    "create_time":build.create_time,
+                    "lastupdate_time":build.lastupdate_time
+                    }
+            pipeline[build.task.stage.value][build.name] = data
+        print pipeline
+        return pipeline
+    
 
 class Featurebuilder(models.Model):
     name = models.CharField(max_length=200)
     feature = models.ForeignKey(Feature, on_delete=models.CASCADE)
     uuid = models.CharField(max_length=200,default="")
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "{}_{}".format(self.uuid,self.name)
@@ -247,6 +314,8 @@ class Build(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE,blank=True,null=True)
     trigger = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True)
     params = models.TextField(default="")
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name
@@ -298,6 +367,8 @@ class Envvariable(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE,null=True,blank=True)
     name = models.CharField(max_length=200)
     value = models.CharField(max_length=200)
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.name

@@ -76,7 +76,23 @@ class FeatureViewSet(mixins.ListModelMixin,
         return queryset
     
     def get(self, request, *args, **kwargs): 
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return  self.list(self, request, *args, **kwargs)
+#     Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class PipeLineViewSet(mixins.ListModelMixin,
+                  generics.GenericAPIView):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = PipeLineSerializer
+    
+    def get_queryset(self):
+        queryset = Feature.objects.filter()
+        return queryset
+    
+    def get(self, request, *args, **kwargs): 
+        return  self.list(self, request, *args, **kwargs)
 
 
 class NewfeatureViewSet(mixins.ListModelMixin,
