@@ -17,10 +17,9 @@ class JSONSerializerField(serializers.Field):
             pass
         finally:
             return json_data
+    
     def to_representation(self, value):
         return value
-
-
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,9 +30,10 @@ class TaskSerializer(serializers.ModelSerializer):
     product = serializers.CharField(source="product.name",read_only=True)
     type = serializers.CharField(source="type.name",read_only=True)
     stage = serializers.CharField(source="stage.name",read_only=True)
+    params = JSONSerializerField(source="getcustomparams",)
     class Meta:
         model = Task
-        fields = ('id','name', 'product', 'type','stage')
+        fields = ('id','name', 'product', 'type','stage','params')
 
 class ModuleSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source="type.name",read_only=True)
@@ -44,8 +44,7 @@ class ModuleSerializer(serializers.ModelSerializer):
         fields = ('id','name','repository','repositoryserver', 'type','product',)
 
 class BuildSerializer(serializers.ModelSerializer):
-#     params = serializers.JSONField(source="getdynamicparams",)
-    params = JSONSerializerField(source="getdynamicparams",)
+    params = JSONSerializerField(source="getstaticparams",)
     taskname = serializers.CharField(source="task.name",read_only=True)
     stage = serializers.CharField(source="task.stage.name",read_only=True)
     status = serializers.CharField(source="status.name",read_only=True)
@@ -97,7 +96,6 @@ class FeaturebuilderSerializer(serializers.ModelSerializer):
                 instance.params = json.dumps(instance.getdynamicparams())
                 # 分发任务到gearman,并更新状态
                 if stage == pipeline.keys()[0]:
-                    instance.params = json.dumps(instance.getdynamicparams())
                     instance.status,_ = Status.objects.get_or_create(name="waiting")
                     t = task_client(instance)
                     t.trigger_builder()
@@ -106,36 +104,49 @@ class FeaturebuilderSerializer(serializers.ModelSerializer):
         return fb
 
 
+class ParamSerializer(serializers.ModelSerializer):
+    task = serializers.CharField(source="task.name",read_only=True)
+    table = serializers.CharField(source="getboundtable",read_only=True)
+    class Meta:
+        model = Param
+        fields = ('name', 'value', 'task','table')
+
 class FeatureSerializer(serializers.ModelSerializer):
     product = serializers.CharField(source="product.name",read_only=True)
     type = serializers.CharField(source="type.name",read_only=True)
     task = TaskSerializer(read_only=True, many=True)
     module = ModuleSerializer(read_only=True, many=True)
+    params = JSONSerializerField(source="getcurrent_vars",read_only=True)
     
-    testbuilds = BuildSerializer(source='getlatestbuild', many=True)
+#     testbuilds = BuildSerializer(source='getlatestbuild', many=True)
     
     class Meta:
         model = Feature
-        fields = ('name', 'product', 'type','task','module','testbuilds')
+#         fields = ('name', 'product', 'type','task','module','testbuilds','params')
+        fields = ('name', 'product', 'type','task','module','params')
+    
+    
+    
+    
         
 class PipeLineSerializer(serializers.ModelSerializer):
-    pipeline = serializers.JSONField(source="getlatestpipeline",read_only=True)
+    pipeline = JSONSerializerField(source="getlatestpipeline",read_only=True)
     class Meta:
         model = Feature
         fields = ('pipeline',)
         
-
 class NewfeatureSerializer(serializers.ModelSerializer):
     product = serializers.CharField(source="product.name",read_only=True)
     type = serializers.CharField(source="type.name",read_only=True)
     task = TaskSerializer(read_only=True, many=True)
     module = ModuleSerializer(read_only=True, many=True)
     
-    testbuilds = BuildSerializer(source='getlatestbuild', many=True)
+#     testbuilds = BuildSerializer(source='getlatestbuild', many=True)
     
     class Meta:
         model = Feature
-        fields = ('name', 'product', 'type','task','module','testbuilds')
+#         fields = ('name', 'product', 'type','task','module','testbuilds')
+        fields = ('name', 'product', 'type','task','module')
         
 
 class UpstatusSerializer(serializers.ModelSerializer):

@@ -70,6 +70,7 @@ class FeatureViewSet(mixins.ListModelMixin,
     """
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = FeatureSerializer
+    filter_fields = ('name', )
     
     def get_queryset(self):
         queryset = Feature.objects.filter()

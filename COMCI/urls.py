@@ -24,7 +24,7 @@ from rest_framework.authtoken import views as vs
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^getallfeatures/$', views.FeatureViewSet.as_view()),
-    url(r'^feature/(?P<pk>[0-9]+)/$', views.FeatureViewSet.as_view()),
+    url(r'^feature/$', views.FeatureViewSet.as_view()),
     url(r'^trigger/$', views.TriggerViewSet.as_view()),
     url(r'^upstatus/(?P<pk>[0-9]+)/$', views.UpstatusViewSet.as_view()),
     url(r'^newfeature/$', views.NewfeatureViewSet.as_view()),

@@ -6,7 +6,7 @@ from .models import *
 
   
 class FeatureAdmin(admin.ModelAdmin):  
-    filter_horizontal = ('task','module',)  
+    filter_horizontal = ('task','module','params')  
     
 class UserdefcasesetAdmin(admin.ModelAdmin): 
     filter_horizontal = ('caseset',)  
@@ -21,6 +21,8 @@ class TaskAdmin(admin.ModelAdmin):
 admin.site.register(Feature, FeatureAdmin)  
 
 admin.site.register(Featuretype)
+admin.site.register(Param)
+admin.site.register(FilterTables)
 admin.site.register(Product)
 admin.site.register(Stage)
 admin.site.register(Status)

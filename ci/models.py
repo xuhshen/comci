@@ -23,6 +23,9 @@ class Featuretype(models.Model):
     lastupdate_time = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name 
+    
+    def getvalue(self):
+        return self.name
 
 class Product(models.Model):
     '''define the product ,example:rcp,bts,5g 
@@ -33,7 +36,10 @@ class Product(models.Model):
     
     def __str__(self):
         return self.name
-
+    
+    def getvalue(self):
+        return self.name
+    
 class Stage(models.Model):
     '''define the task phase,in order to run task  serial or parallel
     '''
@@ -44,24 +50,10 @@ class Stage(models.Model):
     
     def __str__(self):
         return self.name 
-
-class Key_tables(models.Model):
-    key = models.CharField(max_length=200)
-    table = models.CharField(max_length=200)
-    create_time = models.DateTimeField(auto_now_add=True)
-    lastupdate_time = models.DateTimeField(auto_now=True)
     
-    def __str__(self):
+    def getvalue(self):
         return self.name
-    
-    def getvalues(self):
-        try:
-            values = eval(self.table).objects.all()
-        except:
-            values = None
-        
-        return values
-    
+
 class Status(models.Model):
     '''define the status types for builds and features
     '''
@@ -69,7 +61,10 @@ class Status(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     lastupdate_time = models.DateTimeField(auto_now=True)
     def __str__(self):
-        return self.name    
+        return self.name  
+    
+    def getvalue(self):
+        return self.name  
 
 class Gearman(models.Model):
     '''define the distribute server,as for different product, this may different
@@ -81,6 +76,9 @@ class Gearman(models.Model):
     
     def __str__(self):
         return self.name  
+    
+    def getvalue(self):
+        return self.name
 
 class Repository(models.Model):
     name = models.CharField(max_length=200)
@@ -91,6 +89,9 @@ class Repository(models.Model):
     def __str__(self):
         return self.name  
     
+    def getvalue(self):
+        return self.name
+    
 class Tasktype(models.Model):
     '''define the task type ,example: normal task or pipe line or build flow
     '''
@@ -100,6 +101,19 @@ class Tasktype(models.Model):
     def __str__(self):
         return self.name
     
+    def getvalue(self):
+        return self.name
+
+class TaskParam(models.Model):
+    name = models.CharField(max_length=200)
+    value = models.CharField(max_length=200)
+    
+    def __str__(self):
+        pass
+    
+    def getvalue(self):
+        return self.name
+
 class Task(models.Model):
     '''
     '''
@@ -123,23 +137,67 @@ class Task(models.Model):
     def __str__(self):
         return self.name
     
-    def getfeature_defined_params(self):
+    def getcustomparams(self,):
+        membertable = "Key_tables"
+        bound_vars = {var.key:var for var in eval(membertable).objects.filter(task=self)}
+
         res = {}
         for k_val in self.params.split("\n"):
             try:
                 clean_str = k_val.strip()
                 key,var = clean_str.split("=")
-                if key.startswith("__"):
-                    res[key] = var
+                if key.startswith("**"):
+                    n_key = key.replace("**","") 
+                    if bound_vars.has_key(n_key):
+                        res[n_key] = bound_vars[n_key].getvalue()
+                    else:
+                        res[n_key] = var
             except:
                 pass
+            
         return res
+ 
+class FilterTables(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+class Key_tables(models.Model):
+    key = models.CharField(max_length=200)
+    table = models.ForeignKey(FilterTables, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    
+    create_time = models.DateTimeField(auto_now_add=True)
+    lastupdate_time = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.key
+    
+    def getvaluelist(self):
+        try:
+            values = eval(self.table.name).objects.all()
+        except:
+            return None
+        return values
+    
+    def getvalue(self):
+        try:
+            val = self.getvaluelist()[0].getvalue()
+        except:
+            val = ""
+            
+        return val
 
 class Moduletype(models.Model):
     name = models.CharField(max_length=200)
     create_time = models.DateTimeField(auto_now_add=True)
     lastupdate_time = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
+        return self.name
+    
+    def getvalue(self):
         return self.name
 
 class Module(models.Model):
@@ -157,6 +215,9 @@ class Module(models.Model):
     def __str__(self):
         return self.name
 
+    def getvalue(self):
+        return self.name
+    
 class Caseset(models.Model):
     name = models.CharField(max_length=200)
     value = models.CharField(max_length=200)
@@ -165,6 +226,9 @@ class Caseset(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def getvalue(self):
+        return self.value
 
 class Userdefcaseset(models.Model):
     name = models.CharField(max_length=200)
@@ -175,6 +239,10 @@ class Userdefcaseset(models.Model):
     lastupdate_time = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.name
+    
+    def getvalue(self):
+        res = [item.getvalue() for item in self.caseset.all()]
+        return res
 
 class Casetag(models.Model):
     '''define test case tags
@@ -187,7 +255,11 @@ class Casetag(models.Model):
     
     def __str__(self):
         return self.name
-
+    
+    def getvalue(self):
+        return self.tag
+    
+    
 class Userdeftagset(models.Model):
     '''define test case tags
     '''
@@ -200,6 +272,33 @@ class Userdeftagset(models.Model):
     def __str__(self):
         return self.name
 
+    def getvalue(self):
+        res = [item.getvalue() for item in self.tagset.all()]
+        return res
+    
+class Param(models.Model):
+    name = models.CharField(max_length=200)
+    value = models.CharField(max_length=500)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.name
+    
+    def getboundtable(self):
+        try:
+            bound_table = Key_tables.objects.get(task=self.task,key=self.name).table.name
+        except:
+            bound_table = ""
+        return bound_table
+    
+    def getdefaultvalue(self):
+        table = self.getboundtable()
+        if table:
+            lst = {item.id:[item.name,item.value] for item in eval(table).objects.all()}
+        else:
+            lst = {}
+        return lst
+    
 class Feature(models.Model):
     '''define the feature for product developing
     '''
@@ -212,7 +311,8 @@ class Feature(models.Model):
     task = models.ManyToManyField(Task, verbose_name=u'task list') 
     module = models.ManyToManyField(Module, verbose_name=u'subsystem list') 
     
-    params = models.TextField(default="",blank=True,help_text="used to redefine task paramers")    
+#     params = models.TextField(default="",blank=True,help_text="used to redefine task paramers")    
+    params = models.ManyToManyField(Param, verbose_name=u'Params') 
     
     create_time = models.DateTimeField(auto_now_add=True)
     lastupdate_time = models.DateTimeField(auto_now=True)
@@ -221,7 +321,16 @@ class Feature(models.Model):
         return self.name
     
     def getcurrent_vars(self):
-        res = json.loads(self.params)
+        res = collections.OrderedDict({ 
+                    task.name:
+                        {
+                         p.name:{"value":p.value,
+                                 "table":p.getboundtable()
+                                 } 
+                           for p in self.params.filter(task=task) 
+                        } 
+                    for task in self.task.all()
+                  })
         return res
     
     def updateparams(self,res,task,add=True):
@@ -262,14 +371,13 @@ class Feature(models.Model):
     
     def getlatestpipeline(self):
         try:
-            latestbuild = Featurebuilder.objects.order_by('-create_time')[5] 
+            latestbuild = Featurebuilder.objects.order_by('-create_time')[0] 
         except:
             return {}
         
         pipeline = collections.OrderedDict()
         
         builds = Build.objects.filter(uuid=latestbuild)
-        print builds
         stage = sorted(list(set([build.task.stage.value for build in builds])))
         
         for key in stage:
@@ -286,7 +394,6 @@ class Feature(models.Model):
                     "lastupdate_time":build.lastupdate_time
                     }
             pipeline[build.task.stage.value][build.name] = data
-        print pipeline
         return pipeline
 
 class Featurebuilder(models.Model):
@@ -344,13 +451,8 @@ class Build(models.Model):
            res[obj.name] = obj.value
         
         # get dynamic vars from feature 
-        for k_val in self.feature.params.split("\n"):
-            try:
-                clean_str = k_val.strip()
-                key,var = clean_str.split("=")
-                res[key] = var
-            except:
-                pass
+        for param in self.feature.params.filter(task=self.task):
+            res[param.name] = param.value
         return res
 
 
