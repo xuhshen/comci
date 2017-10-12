@@ -1,62 +1,69 @@
-前后台接口函数：
-
-GET /newfeature/
-	获取新建feature 结构数据
-
-return :
-	{
-	    "name":"",
-	    "branch":"",
-	    "product":Product.objects.all(),
-	    "type":,                                  #Featuretype.objects.filter(product=product),根据选择的product，返回可选列表
-	    "task":, 				                  #Task.objects.all()，根据选择的product，返回可选列表
-	    "module":,    					          #Module.objects.all()，根据选择的product，返回可选列表
-	    "params":{},							  #根据选择的task，返回对应的自定义变量
-    }
+接口：
 	
-POST /newfeature/  
-	保存新feature 到数据库
-	data:
-	{
-	    "name":"",
-	    "branch":"",
-	    "product":<Product>,
-	    "type":<Featuretype>,
-	    "task":[<task1>,<task2>,<task3>],
-	    "module":[<subsystem1>,<subsystem2>,<subsystem3>],
-	    "params":{
-	    			"<taskname>":{
-	    							"<var1>":"",
-	    							"<var2>":"",
-	    						}
-	    		  },
-    }
+	http://10.140.179.112:8000/trigger/?feature__name=demo1234567&uuid=2e514a5ea1c811e79332bc5e551838ea
 	
+	支持feature__name 和 uuid 过滤
 
-GET /feature/(?P<pk>[0-9]+)/
-         获取对应id feaature的结构数据
-         
-POST /feature/(?P<pk>[0-9]+)/
-         更新对应feature 到数据库
+返回：
+			[
+			    {
+			        "feature": "demo1234567",
+			        "uuid": "2e514a5ea1c811e79332bc5e551838ea",
+			        "featureid": "1234567",
+			        "builds": [
+			            {
+			                "taskname": "COMCI_compile",
+			                "stage": "compile_100",
+			                "status": "passed",
+			                "params": {
+			                    "CI_BUILD_UUID": "2e514a5ea1c811e79332bc5e551838ea",
+			                    "CI_BUILD_ID": 32,
+			                    "EXTEND_RCP_ALL_TOSCO_SERVER": "halebopp.tre.noklab.net",
+			                    "CI_FEATUREBRANCH": "sdf",
+			                    "EXTEND_RCP_ALL_ENV": "22222",
+			                    "CI_FEATURENAME": "test_post",
+			                    "EXTEND_RCP_COMPILE_ENV1": "444",
+			                    "CI_FEATUREID": "1234567",
+			                    "EXTEND_RCP_COMPILE_ENV5": "88888888888",
+			                    "EXTEND_RCP_COMPILE_ENV4": "11111",
+			                    "CI_BUILD_NAME": "2e514a5ea1c811e79332bc5e551838ea:test_post:compile",
+			                    "CI_PRODUCT": "RCP",
+			                    "EXTEND_RCP_ALL_HANGZHOU_SERVER": "10.56.118.71"
+			                },
+			                "gearman": "gearman test",
+			                "buildurl": "http://10.159.212.95:8080/job/compile/6/parameters/"
+			            },
+			            {
+			                "taskname": "COMCI_ut",
+			                "stage": "ut_100",
+			                "status": "passed",
+			                "params": {
+			                    "CI_BUILD_UUID": "2e514a5ea1c811e79332bc5e551838ea",
+			                    "EXTEND_RCP_ALL_HANGZHOU_SERVER": "10.56.118.71",
+			                    "EXTEND_RCP_ALL_TOSCO_SERVER": "halebopp.tre.noklab.net",
+			                    "CI_FEATUREBRANCH": "sdf",
+			                    "EXTEND_RCP_ALL_ENV": "22222",
+			                    "CI_FEATURENAME": "test_post",
+			                    "CI_BUILD_ID": 33,
+			                    "CI_FEATUREID": "1234567",
+			                    "CI_BUILD_NAME": "2e514a5ea1c811e79332bc5e551838ea:test_post:ut",
+			                    "CI_PRODUCT": "RCP",
+			                    "EXTEND_RCP_UT_ENV": "333"
+			                },
+			                "gearman": "gearman test",
+			                "buildurl": "http://10.159.212.95:8080/job/ut/15/parameters/"
+			            },
+			            {
+			                "taskname": "COMCI_FT",
+			                "stage": "FT_120",
+			                "status": "waiting",
+			                "params": {},
+			                "gearman": "gearman test",
+			                "buildurl": ""
+			            }
+			        ]
+			    }
+			]
+			
+			
 
-
-        
-POST /trigger/                            done
-         触发一次feature 测试
-    
-    data：
-    	{
-		    "featureid": ""
-		}
-       
-POST /upstatus/(?P<pk>[0-9]+)/            done
-        跟新对应build的状态               
-   data：
-	   {
-		    "status": "",
-		    "buildurl": "",
-		    "name": ""
-	   }
-	   
-	   
-	   

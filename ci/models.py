@@ -333,6 +333,10 @@ class Feature(models.Model):
                   })
         return res
     
+    def getlatestbuild(self):
+        '''manytomany field'''
+        return Build.objects.filter(feature__name=self.name)
+    
     def updateparams(self,res,task,add=True):
         if add:
             if not res.has_key(task.name):
@@ -342,10 +346,6 @@ class Feature(models.Model):
             except:pass
         return res
         
-    def getlatestbuild(self):
-        '''manytomany field'''
-        return Build.objects.filter(feature__name=self.name)
-    
     def getpipeline(self,uuid=None):
         pipeline = collections.OrderedDict()
         
@@ -405,6 +405,9 @@ class Featurebuilder(models.Model):
 
     def __str__(self):
         return "{}_{}".format(self.uuid,self.name)
+    
+    def getbuilddetail(self):
+        return Build.objects.filter(uuid=self)
     
 class Build(models.Model):
     '''define the build info for echo task

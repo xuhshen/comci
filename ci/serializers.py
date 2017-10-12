@@ -59,9 +59,10 @@ class FeaturebuilderSerializer(serializers.ModelSerializer):
 #     builds = BuildSerializer(read_only=True, many=True)
     feature = serializers.CharField(source="feature.name",read_only=True)
     featureid = serializers.CharField(source="feature.featureid")
+    builds = BuildSerializer(source='getbuilddetail', many=True)
     class Meta:
         model = Featurebuilder
-        fields = ["feature","uuid","featureid"]
+        fields = ["feature","uuid","featureid",'builds']
         read_only_fields = ["uuid"]
     
     def validate(self, attrs):
@@ -103,6 +104,7 @@ class FeaturebuilderSerializer(serializers.ModelSerializer):
                 instance.save()
         return fb
 
+#######done
 
 class ParamSerializer(serializers.ModelSerializer):
     task = serializers.CharField(source="task.name",read_only=True)
@@ -111,24 +113,26 @@ class ParamSerializer(serializers.ModelSerializer):
         model = Param
         fields = ('name', 'value', 'task','table')
 
+
 class FeatureSerializer(serializers.ModelSerializer):
-    product = serializers.CharField(source="product.name",read_only=True)
-    type = serializers.CharField(source="type.name",read_only=True)
+    product = serializers.CharField(source="product.name",)
+    type = serializers.CharField(source="type.name",)
     task = TaskSerializer(read_only=True, many=True)
     module = ModuleSerializer(read_only=True, many=True)
     params = JSONSerializerField(source="getcurrent_vars",read_only=True)
-    
 #     testbuilds = BuildSerializer(source='getlatestbuild', many=True)
     
     class Meta:
         model = Feature
 #         fields = ('name', 'product', 'type','task','module','testbuilds','params')
-        fields = ('name', 'product', 'type','task','module','params')
-    
-    
-    
-    
-        
+        fields = ('id','branch','featureid','name', 'product', 'type','task','module','params')
+
+    def validate(self, attrs):
+        pass
+    def update(self, instance, validated_data):
+        pass   
+
+###########done
 class PipeLineSerializer(serializers.ModelSerializer):
     pipeline = JSONSerializerField(source="getlatestpipeline",read_only=True)
     class Meta:
@@ -149,6 +153,7 @@ class NewfeatureSerializer(serializers.ModelSerializer):
         fields = ('name', 'product', 'type','task','module')
         
 
+#############done
 class UpstatusSerializer(serializers.ModelSerializer):
     
     feature = serializers.CharField(source="feature.name",read_only=True)

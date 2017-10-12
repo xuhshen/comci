@@ -64,13 +64,14 @@ class TaskViewSet(mixins.ListModelMixin,
     
 
 class FeatureViewSet(mixins.ListModelMixin,
+                     mixins.UpdateModelMixin,
                   generics.GenericAPIView):
     """
     API endpoint that allows users to be viewed or edited.
     """
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = FeatureSerializer
-    filter_fields = ('name', )
+    filter_fields = ('name', 'id')
     
     def get_queryset(self):
         queryset = Feature.objects.filter()
@@ -78,13 +79,13 @@ class FeatureViewSet(mixins.ListModelMixin,
     
     def get(self, request, *args, **kwargs): 
         return  self.list(self, request, *args, **kwargs)
-#     Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def post(self, request, *args, **kwargs):
+        return self.update(request,*args, **kwargs)
 
 class PipeLineViewSet(mixins.ListModelMixin,
                   generics.GenericAPIView):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
+
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = PipeLineSerializer
     filter_fields = ('name', )
@@ -130,10 +131,14 @@ class TriggerViewSet(mixins.ListModelMixin,
 
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = FeaturebuilderSerializer
+    filter_fields = ('feature__name', 'uuid')
     
     def get_queryset(self):
         queryset = Featurebuilder.objects.filter()
         return queryset
+
+    def get(self, request, *args, **kwargs): 
+        return self.list(self, request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         '''
