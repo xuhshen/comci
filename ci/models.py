@@ -104,16 +104,6 @@ class Tasktype(models.Model):
     def getvalue(self):
         return self.name
 
-class TaskParam(models.Model):
-    name = models.CharField(max_length=200)
-    value = models.CharField(max_length=200)
-    
-    def __str__(self):
-        pass
-    
-    def getvalue(self):
-        return self.name
-
 class Task(models.Model):
     '''
     '''
@@ -149,9 +139,10 @@ class Task(models.Model):
                 if key.startswith("**"):
                     n_key = key.replace("**","") 
                     if bound_vars.has_key(n_key):
-                        res[n_key] = bound_vars[n_key].getvalue()
+                        res[n_key] = {"value":bound_vars[n_key].getvalue(),
+                                      "table":bound_vars[n_key].table.name}
                     else:
-                        res[n_key] = var
+                        res[n_key] = {"value":var,"table":""}
             except:
                 pass
             

@@ -56,7 +56,6 @@ class BuildSerializer(serializers.ModelSerializer):
         fields = ["taskname","stage","status","params","trigger","gearman","buildurl"]
         
 class FeaturebuilderSerializer(serializers.ModelSerializer):
-#     builds = BuildSerializer(read_only=True, many=True)
     feature = serializers.CharField(source="feature.name",read_only=True)
     featureid = serializers.CharField(source="feature.featureid")
     builds = BuildSerializer(source='getbuilddetail', many=True)
